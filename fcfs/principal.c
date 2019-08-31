@@ -4,16 +4,17 @@
 #include <signal.h>
 #include "procesos.h"
 
-proceso_t *head;
+data_t data;
 
 int
 main()
 {
-	head = NULL;
+	data.ready = NULL;
+	data.terminated = NULL;
 	pthread_t sched;
 	pthread_t monitor;
-	pthread_create(&monitor, NULL, moni_hnd, (void *) &head);
-	pthread_create (&sched, NULL, sched_hnd, (void *) &head);
+	pthread_create(&monitor, NULL, moni_hnd, (void *) &data);
+	pthread_create (&sched, NULL, sched_hnd, (void *) &data);
 	pthread_join(sched, NULL);
 	signal (1, sig_handler);
 }
@@ -32,6 +33,7 @@ sig_handler(int signo)
 	init(proceso);
 	insertar_final(&proceso);
 	break;
+
 	}
 }
 
@@ -39,7 +41,6 @@ void
 init (proceso_t * proceso)
 {
 	proceso->id = -1;
-	proceso->estado = READY;
 	proceso->totalTime = rand() %20;
 	proceso->remainingTime = proceso->totalTime;
 	proceso-> proceso= crearThread(proceso);
@@ -53,7 +54,6 @@ init (proceso_t * proceso)
 pthread_t * crearThread(proceso_t * proceso)
 {
 	pthread_t *hilo = (pthread_t *)malloc(sizeof(pthread_t));
-	pthread_create(hilo, NULL, process_hnd, (void *)proceso);
 	return hilo;
 }
 
@@ -68,7 +68,7 @@ void
 insertar_final (proceso_t **elem)
 {
 	proceso_t **proceso;
-	proceso = &head;
+	proceso = &(data.ready);
 	int i = 0;
 	while(*proceso != NULL)
 	{

@@ -3,22 +3,20 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <ncurses.h>
+#include <signal.h>
 #include "procesos.h"
 
 void *moni_hnd(void * arg)
 {
-	proceso_t **procesos = (proceso_t **) arg;
-
+	data_t *data = (data_t *) arg;
+	signal(1,sig_handler);
 	initCurse();
 	while (TRUE) 
 	{
 		clear();
-		mostrarRuning(*procesos);
-		mostrarReady(*procesos);
-		mostrarTerminated(*procesos);
-//		printf("moni: %d\n",*procesos);
-		//if(*procesos!=NULL)		
-		//printf("ID: %d\n", (*procesos)->id);	
+		mostrarRuning(data->ready);
+		mostrarReady(data->ready);
+		mostrarTerminated(data->terminated);
 	
 		usleep(500000);
 		refresh();
@@ -43,34 +41,30 @@ void mostrarRuning (proceso_t *procesos)
 {
 	mvprintw(0, 0,"Runing:\n");
 	mvprintw(2, 0,"ID:\n");
-	mvprintw(2, 20,"TR:\n");
-	int i = 2;
+	mvprintw(2, 10,"TR:\n");
 	proceso_t *next = procesos;
-	while (next != NULL)
+	if (next != NULL)
 	{
-		if (next->estado == RUNNING) 
-		{
-		mvprintw(2*i, 0,"%d\n", next->id);
-		mvprintw(2*i, 20,"%d\n", next->remainingTime);
-		}
-		i++;
-		next = next->next;
+		
+		mvprintw(4, 0,"%d\n", next->id);
+		mvprintw(4, 10,"%d\n", next->remainingTime);
+		
 	}
 }
 
 void mostrarReady (proceso_t *procesos) 
 {
-	mvprintw(0, 40,"Ready:\n");
-	mvprintw(2, 40,"ID:\n");
-	mvprintw(2, 60,"TR:\n");
-	int i = 2;
+	mvprintw(0, 30,"Ready:\n");
+	mvprintw(2, 30,"ID:\n");
+	mvprintw(2, 40,"TR:\n");
+	int i = 1;
 	proceso_t *next = procesos;
 	while (next != NULL)
 	{
-		if (next->estado == READY) 
+		if (i>1) 
 		{
-		mvprintw(2*i, 40,"%d\n", next->id);
-		mvprintw(2*i, 60,"%d\n", next->remainingTime);
+		mvprintw(2*i, 30,"%d\n", next->id);
+		mvprintw(2*i, 40,"%d\n", next->remainingTime);
 		}
 		i++;
 		next = next->next;
@@ -79,19 +73,16 @@ void mostrarReady (proceso_t *procesos)
 
 void mostrarTerminated (proceso_t *procesos) 
 {
-	mvprintw(0, 80,"Termitaed:\n");
-	mvprintw(2, 80,"ID:\n");
-	mvprintw(2, 100,"TR:\n");
-
+	mvprintw(0, 60,"Termitaed:\n");
+	mvprintw(2, 60,"ID:\n");
+	mvprintw(2, 70,"TR:\n");
+	
 	int i = 2;
 	proceso_t *next = procesos;
 	while (next != NULL)
 	{
-		if (next->estado == TERMINATED) 
-		{
-		mvprintw(2*i, 80,"%d\n", next->id);
-		mvprintw(2*i, 100,"%d\n", next->remainingTime);
-		}
+		mvprintw(2*i, 60,"%d\n", next->id);
+		mvprintw(2*i, 70,"%d\n", next->remainingTime);
 		i++;
 		next = next->next;
 	}

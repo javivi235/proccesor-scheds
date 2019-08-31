@@ -3,11 +3,6 @@
 #define TRUE 1
 #define FALSE 0
 
-#define CREATED 0
-#define READY 1
-#define RUNNING 2
-#define WAIT 3
-#define TERMINATED 4
 typedef struct proceso proceso_t;
 
 struct proceso
@@ -15,7 +10,6 @@ struct proceso
 	int id;
 	pthread_t *proceso;
 	pthread_mutex_t mtx;
-	int estado;
 	int totalTime;
 	int remainingTime;
 	pthread_cond_t p_cond;
@@ -23,6 +17,13 @@ struct proceso
 	proceso_t *next;
 
 };
+
+typedef struct
+{
+	proceso_t *ready;
+	proceso_t *terminated;
+
+} data_t;
 
 proceso_t * crearProceso();
 void init (proceso_t *);
@@ -36,3 +37,4 @@ void mostrarReady (proceso_t *);
 void mostrarTerminated (proceso_t *);
 pthread_t * crearThread(proceso_t *);
 void insertar_final (proceso_t **);
+void insertar_inicio (data_t *);
