@@ -13,15 +13,23 @@ void *sched_hnd(void * arg)
 	{
 		if (data->ready != NULL)
 		{
-			if ((data->ready)->remainingTime == (data->ready)->totalTime)
+
+			pthread_mutex_lock(&((data->sched)->mtx));
+			if ((data->sched)->cond)
 			{
-			(data->ready)->cond = TRUE;
-			pthread_create(((data->ready)->proceso), NULL, process_hnd, (void *)(data->ready));			
-			} else if ((data->ready)->remainingTime ==0) 
-			{
-				(data->ready)->cond = FALSE;
+				instancia_t ins;
+				ins.proceso = data->ready;
+				ins.sched = data->sched;
+				pthread_create(((data->ready)->proceso), NULL, process_hnd, (void *)(&ins));
+				(data->ready)->cond = TRUE;
+				(data->sched)->cond = FALSE;
+				pthread_cond_wait(&((data->sched)->p_cond), &((data->sched)->mtx));
+				(data->sched)->cond = TRUE;
 				insertar_inicio(data);
+			
 			}
+			pthread_mutex_unlock(&((data->sched)->mtx));
+
 		}
 	}
 	return NULL;

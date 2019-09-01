@@ -18,10 +18,27 @@ struct proceso
 
 };
 
+
+typedef struct
+{
+	pthread_t *proceso;
+	pthread_mutex_t mtx;
+	pthread_cond_t p_cond;
+  	int cond;	
+}sched_t;
+
+typedef struct
+{
+	proceso_t *proceso;
+	sched_t *sched;
+}instancia_t;
+
 typedef struct
 {
 	proceso_t *ready;
 	proceso_t *terminated;
+	sched_t *sched;
+	int lastID;
 
 } data_t;
 

@@ -8,20 +8,23 @@
 
 void *process_hnd(void * arg)
 {
-	proceso_t *procesos = (proceso_t *) arg;
+	instancia_t *ins = (instancia_t *) arg;
 	signal(1,sig_handler);
 	while (TRUE) 
 	{
-		pthread_mutex_lock(&(procesos->mtx));
-		if (procesos->cond)
+		pthread_mutex_lock(&((ins->proceso)->mtx));
+		if ((ins->proceso)->cond)
 		{
-			while (procesos->remainingTime > 0)
+			while ((ins->proceso)->remainingTime > 0)
 			{
-			procesos->remainingTime = procesos->remainingTime 				-1;		
+			(ins->proceso)->remainingTime = (ins->proceso)->remainingTime -1;		
 			usleep(1000000);				
 			}
+			(ins->proceso)->cond = FALSE;
+			pthread_cond_signal(&((ins->sched)->p_cond));
+			
 		}
-		pthread_mutex_unlock(&(procesos->mtx));
+		pthread_mutex_unlock(&((ins->proceso)->mtx));
 		
 		break;
 	}

@@ -9,13 +9,27 @@ data_t data;
 int
 main()
 {
-	data.ready = NULL;
-	data.terminated = NULL;
+
 	pthread_t sched;
 	pthread_t monitor;
+
+	sched_t schedData;
+
 	pthread_create(&monitor, NULL, moni_hnd, (void *) &data);
 	pthread_create (&sched, NULL, sched_hnd, (void *) &data);
+
+	data.sched = &schedData;
+	(data.sched)->proceso = &sched;
+	(data.sched)->mtx = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+	(data.sched)->p_cond = (pthread_cond_t)  PTHREAD_COND_INITIALIZER;
+	(data.sched)->cond = TRUE;
+
+	data.ready = NULL;
+	data.terminated = NULL;
+	data.lastID = 0;
+
 	pthread_join(sched, NULL);
+
 	signal (1, sig_handler);
 }
 
@@ -30,7 +44,6 @@ sig_handler(int signo)
 	case 1:
 	
 	proceso = crearProceso();	
-	init(proceso);
 	insertar_final(&proceso);
 	break;
 
@@ -40,7 +53,8 @@ sig_handler(int signo)
 void
 init (proceso_t * proceso)
 {
-	proceso->id = -1;
+	data.lastID++;
+	proceso->id = data.lastID;
 	proceso->totalTime = rand() %20;
 	proceso->remainingTime = proceso->totalTime;
 	proceso-> proceso= crearThread(proceso);
@@ -69,14 +83,11 @@ insertar_final (proceso_t **elem)
 {
 	proceso_t **proceso;
 	proceso = &(data.ready);
-	int i = 0;
 	while(*proceso != NULL)
 	{
 		proceso = &((*proceso)->next);	
-		i++;	
 	}
 	*proceso = *elem;
-	((*proceso)->id) = i;
 }
 
 
