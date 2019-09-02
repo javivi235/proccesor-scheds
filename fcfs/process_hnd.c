@@ -17,7 +17,7 @@ void *process_hnd(void * arg)
 		{
 			while ((ins->proceso)->remainingTime > 0)
 			{
-			(ins->proceso)->remainingTime = (ins->proceso)->remainingTime -1;		
+			(ins->proceso)->remainingTime--;		
 			usleep(1000000);				
 			}
 			(ins->proceso)->cond = FALSE;
