@@ -15,12 +15,12 @@ void *process_hnd(void * arg)
 		pthread_mutex_lock(&((ins->proceso)->mtx));
 		if ((ins->proceso)->cond)
 		{
-			while ((ins->proceso)->remainingTime > 0)
+			while ((ins->proceso)->remainingTime > 0 && (ins->proceso)->cond > 0)
 			{
-			(ins->proceso)->remainingTime--;		
+			(ins->proceso)->remainingTime--;
+			(ins->proceso)->cond--;		
 			usleep(1000000);				
 			}
-			(ins->proceso)->cond = FALSE;
 			pthread_cond_signal(&((ins->sched)->p_cond));
 			
 		}
