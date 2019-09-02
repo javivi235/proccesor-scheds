@@ -1,17 +1,17 @@
 CC = gcc
 IDIR = .
 CFLAGS = -I$(IDIR) -std=gnu99
-LIBS = 
-OBJ = principal.c punto.c cadena.c 
-DEPS = punto.h cadena.h
+LIBS = -lpthread -lncurses
+OBJ = principal.c sched_hnd.c moni_hnd.c process_hnd.c
+DEPS = procesos.h
 
 %.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -Wall -c -o $@ $< $(CFLAGS)
 
 
-ds: $(OBJ) 
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+procsched: $(OBJ) 
+	$(CC) -Wall -o $@ $^ $(CFLAGS) $(LIBS)
 
 # clean out the dross
 clean:
-	rm -f ds  *~ *.o 
+	rm -f procsched  *~ *.o 
